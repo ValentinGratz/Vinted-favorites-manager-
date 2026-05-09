@@ -186,6 +186,8 @@ Ce projet est libre d'utilisation et de modification.
 
 Merci d'utiliser Vinted Favorites Manager!
 
+Extension chrome et le code JS à mettre dans l'inspecteur de votre navigateur fait avec Claude IA (Claude Code) version free
+
 💡 **Conseil** : Si tu trouves ça utile, partage-le à tes amis qui utilisent Vinted! ⭐
 
 ---
