@@ -1,6 +1,6 @@
 /**
  * ============================================
- * VINTED FAVORIS MANAGER - VERSION CONSOLE
+ * VINTED FAVORIS MANAGER - VERSION CONSOLE (Améliorée)
  * ============================================
  * 
  * 📌 DESCRIPTION:
@@ -13,10 +13,7 @@
  * 3. Copie tout ce code et colle-le dans la console
  * 4. Appuie sur Entrée
  * 5. Attends 10-15 secondes (chargement automatique de tous les favoris)
- * 6. Utilise le panneau qui apparaît en bas à droite pour:
- *    - Voir tous les articles marqués "Vendu"
- *    - Sélectionner/désélectionner ceux à supprimer
- *    - Cliquer le bouton rouge pour supprimer
+ * 6. Utilise le panneau qui apparaît en bas à droite
  * 
  * ✨ FONCTIONNALITÉS:
  * ✅ Charge TOUS les favoris automatiquement
@@ -26,36 +23,151 @@
  * ✅ Suppression en masse des articles
  * ✅ Vérification que la suppression a fonctionné
  * ✅ Rafraîchissement automatique après suppression
- * 
- * 🔧 COMPATIBLE:
- * - Chrome, Firefox, Edge, Safari
- * - Résolution desktop et tablette
- * - Vinted.fr (autres langues nécessitent adaptation)
+ * ✅ Modales custom (pas d'alert/confirm bloqués)
  * 
  * ⚠️ IMPORTANT:
  * - La page se recharge automatiquement après suppression
- * - Sauvegarde d'abord si tu as d'autres onglets Vinted ouverts
  * - Supprimer des articles est IRRÉVERSIBLE
- * 
- * 📝 NOTES:
- * - Les articles "Vendu" ne sont PAS supprimés de tes annonces
- * - Ils sont juste retirés de la liste "Favoris"
  * - Tu peux les re-favoriser à tout moment
  */
 
 (async function() {
   console.log('🚀 Vinted Favorites Sorter - Démarrage...');
   
+  // ========== FONCTIONS DE MODALES CUSTOM ==========
+  // Remplacent alert() et confirm() qui peuvent être bloqués
+  
+  function showModal(message, type = 'info') {
+    return new Promise(resolve => {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 10001;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 400px;
+        border-left: 4px solid ${type === 'error' ? '#ff4444' : type === 'success' ? '#4CAF50' : '#6496ff'};
+      `;
+      
+      const text = document.createElement('p');
+      text.textContent = message;
+      text.style.cssText = 'margin: 0 0 20px 0; font-size: 14px; color: #333; line-height: 1.5;';
+      
+      const btn = document.createElement('button');
+      btn.textContent = 'OK';
+      btn.style.cssText = `
+        background: ${type === 'error' ? '#ff4444' : type === 'success' ? '#4CAF50' : '#6496ff'};
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+        transition: background 0.2s;
+      `;
+      btn.onmouseover = () => btn.style.opacity = '0.9';
+      btn.onmouseout = () => btn.style.opacity = '1';
+      btn.onclick = () => {
+        modal.remove();
+        resolve();
+      };
+      
+      modal.appendChild(text);
+      modal.appendChild(btn);
+      document.body.appendChild(modal);
+    });
+  }
+  
+  function showConfirm(message) {
+    return new Promise(resolve => {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 10001;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 450px;
+        border-left: 4px solid #ff4444;
+      `;
+      
+      const text = document.createElement('p');
+      text.textContent = message;
+      text.style.cssText = 'margin: 0 0 20px 0; font-size: 14px; color: #333; line-height: 1.6;';
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.cssText = 'display: flex; gap: 10px;';
+      
+      const confirmBtn = document.createElement('button');
+      confirmBtn.textContent = '✅ Oui, supprimer';
+      confirmBtn.style.cssText = `
+        flex: 1;
+        background: #ff4444;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.2s;
+      `;
+      confirmBtn.onmouseover = () => confirmBtn.style.background = '#cc0000';
+      confirmBtn.onmouseout = () => confirmBtn.style.background = '#ff4444';
+      confirmBtn.onclick = () => {
+        modal.remove();
+        resolve(true);
+      };
+      
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = '❌ Annuler';
+      cancelBtn.style.cssText = `
+        flex: 1;
+        background: #ccc;
+        color: #333;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.2s;
+      `;
+      cancelBtn.onmouseover = () => cancelBtn.style.background = '#aaa';
+      cancelBtn.onmouseout = () => cancelBtn.style.background = '#ccc';
+      cancelBtn.onclick = () => {
+        modal.remove();
+        resolve(false);
+      };
+      
+      buttonContainer.appendChild(confirmBtn);
+      buttonContainer.appendChild(cancelBtn);
+      modal.appendChild(text);
+      modal.appendChild(buttonContainer);
+      document.body.appendChild(modal);
+    });
+  }
+  
   // ========== ÉTAPE 1 : CHARGER TOUS LES FAVORIS ==========
   console.log('⏳ Chargement de tous les favoris (scroll infini)...');
   
   let lastHeight = document.body.scrollHeight;
   let attempts = 0;
-  const maxAttempts = 50; // Limite pour éviter boucle infinie
+  const maxAttempts = 50;
   
   while (attempts < maxAttempts) {
     window.scrollTo(0, document.body.scrollHeight);
-    await new Promise(resolve => setTimeout(resolve, 800)); // Attendre le chargement
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     const newHeight = document.body.scrollHeight;
     if (newHeight === lastHeight) {
@@ -81,7 +193,7 @@
   console.log(`📦 Articles marqués "Vendu": ${soldItems.length}`);
 
   if (soldItems.length === 0) {
-    alert('✅ Aucun article vendu dans les favoris !');
+    await showModal('✅ Aucun article vendu dans les favoris !', 'success');
     return;
   }
 
@@ -94,7 +206,6 @@
     item.style.boxSizing = 'border-box';
     item.style.transition = 'all 0.3s ease';
     
-    // Ajouter un badge "VENDU"
     const badge = document.createElement('div');
     badge.textContent = '🔴 VENDU';
     badge.style.cssText = `
@@ -251,14 +362,12 @@
       .map(({ item }) => item);
 
     if (selectedItems.length === 0) {
-      alert('⚠️ Aucun article sélectionné');
+      await showModal('⚠️ Aucun article sélectionné', 'info');
       return;
     }
 
-    const confirmed = confirm(
-      `⚠️ Vous allez supprimer ${selectedItems.length} article(s) des favoris.\n\n` +
-      `Le cœur ❤️ deviendra vide 🤍 pour chaque article.\n\n` +
-      `Êtes-vous sûr ?`
+    const confirmed = await showConfirm(
+      `⚠️ Vous allez supprimer ${selectedItems.length} article(s) des favoris.\n\nÊtes-vous sûr ?`
     );
     if (!confirmed) return;
 
@@ -271,7 +380,6 @@
     let successCount = 0;
     for (const item of selectedItems) {
       try {
-        // Trouver le bouton favori exactement comme dans le HTML
         const favoriteBtn = item.querySelector('button[data-testid*="favourite"]');
         
         if (favoriteBtn) {
@@ -279,25 +387,19 @@
           favoriteBtn.click();
           await new Promise(resolve => setTimeout(resolve, 400));
           
-          // Vérifier que le bouton a bien changé d'état
           const afterState = favoriteBtn.getAttribute('aria-pressed');
           if (beforeState !== afterState) {
             successCount++;
             console.log(`✅ Article supprimé (${successCount}/${selectedItems.length})`);
-          } else {
-            console.warn('⚠️ Le bouton n\'a pas changé d\'état');
           }
-        } else {
-          console.warn('⚠️ Bouton favori non trouvé');
         }
       } catch (error) {
         console.error('❌ Erreur:', error);
       }
     }
 
-    alert(`✅ ${successCount}/${selectedItems.length} article(s) supprimé(s)\n\n⏳ La page va se recharger...`);
+    await showModal(`✅ ${successCount}/${selectedItems.length} article(s) supprimé(s)\n\n⏳ La page va se recharger...`, 'success');
     
-    // Rafraîchir après un délai
     setTimeout(() => {
       location.reload();
     }, 1500);
@@ -307,7 +409,7 @@
 
   // ========== ÉTAPE 8 : NOTES ==========
   const note = document.createElement('p');
-  note.innerHTML = '💡 Les articles rouges = VENDUS<br>🔄 Vous serez rafraîchis après suppression';
+  note.innerHTML = '💡 Les articles rouges = VENDUS<br>🔄 Rafraîchis après suppression';
   note.style.cssText = 'margin: 0; font-size: 12px; color: #999; border-top: 1px solid #555; padding-top: 12px; line-height: 1.5;';
   controlPanel.appendChild(note);
 
