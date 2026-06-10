@@ -1,6 +1,6 @@
 /**
  * ============================================
- * VINTED FAVORIS MANAGER - VERSION CONSOLE (Améliorée)
+ * VINTED FAVORIS MANAGER - VERSION CONSOLE (Améliorée v2)
  * ============================================
  * 
  * 📌 DESCRIPTION:
@@ -12,11 +12,11 @@
  * 2. Ouvre la console: Ctrl+Shift+J (Windows/Linux) ou Cmd+Option+J (Mac)
  * 3. Copie tout ce code et colle-le dans la console
  * 4. Appuie sur Entrée
- * 5. Attends 10-15 secondes (chargement automatique de tous les favoris)
+ * 5. Attends 20-30 secondes (chargement COMPLET de tous les favoris)
  * 6. Utilise le panneau qui apparaît en bas à droite
  * 
  * ✨ FONCTIONNALITÉS:
- * ✅ Charge TOUS les favoris automatiquement
+ * ✅ Charge TOUS les favoris automatiquement (vraiment jusqu'au bout!)
  * ✅ Détecte tous les articles "Vendu"
  * ✅ Les met en évidence visuellement en rouge
  * ✅ Interface de sélection avec checkboxes
@@ -35,7 +35,6 @@
   console.log('🚀 Vinted Favorites Sorter - Démarrage...');
   
   // ========== FONCTIONS DE MODALES CUSTOM ==========
-  // Remplacent alert() et confirm() qui peuvent être bloqués
   
   function showModal(message, type = 'info') {
     return new Promise(resolve => {
@@ -160,27 +159,39 @@
   
   // ========== ÉTAPE 1 : CHARGER TOUS LES FAVORIS ==========
   console.log('⏳ Chargement de tous les favoris (scroll infini)...');
+  console.log('💡 Cela peut prendre 20-30 secondes, sois patient!');
   
   let lastHeight = document.body.scrollHeight;
   let attempts = 0;
-  const maxAttempts = 50;
+  const maxAttempts = 100;
+  let noChangeCount = 0; // Compte les fois sans changement
   
-  while (attempts < maxAttempts) {
+  while (attempts < maxAttempts && noChangeCount < 5) {
     window.scrollTo(0, document.body.scrollHeight);
-    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Attendre que Vinted charge les articles (1.2 secondes au lieu de 0.8)
+    await new Promise(resolve => setTimeout(resolve, 1200));
     
     const newHeight = document.body.scrollHeight;
+    const currentCount = document.querySelectorAll('[data-testid="grid-item"]').length;
+    
     if (newHeight === lastHeight) {
-      console.log('✅ Tous les favoris sont chargés');
-      break;
+      noChangeCount++;
+      console.log(`⏳ Pas de nouveau contenu (${noChangeCount}/5) - Articles actuels: ${currentCount}`);
+    } else {
+      noChangeCount = 0; // Réinitialiser le compteur
+      console.log(`📦 Articles chargés: ${currentCount}`);
     }
+    
     lastHeight = newHeight;
     attempts++;
   }
+  
+  console.log('✅ Chargement terminé!');
 
   // ========== ÉTAPE 2 : TROUVER TOUS LES ARTICLES VENDUS ==========
   const allItems = document.querySelectorAll('[data-testid="grid-item"]');
-  console.log(`📊 Total d'articles: ${allItems.length}`);
+  console.log(`📊 Total d'articles trouvés: ${allItems.length}`);
   
   const soldItems = [];
   allItems.forEach(gridItem => {
