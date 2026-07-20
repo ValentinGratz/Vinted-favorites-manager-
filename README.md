@@ -85,6 +85,13 @@ Un outil simple et efficace pour détecter, sélectionner et supprimer rapidemen
 
 Même processus, mais tu colles d'abord le code dans la console.
 
+### Tuto Vidéo
+
+🎥 Vidéo de démonstration de l'outil :
+
+[![Démo de l'outil](https://img.youtube.com/vi/rOKLo2hO7Wo/maxresdefault.jpg)](https://youtu.be/rOKLo2hO7Wo)
+
+
 ---
 
 ## 🎯 Fonctionnement détaillé
