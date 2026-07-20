@@ -171,6 +171,12 @@ Tu peux :
 ### **Q : Comment je désinstalle l'extension?**
 **R :** Va sur `chrome://extensions/`, cherche "Vinted Favorites Manager" et clique sur le bouton poubelle.
 
+Vous avez une question sur l'installation, l'utilisation ou la sécurité de l'outil ?
+
+👉 Consultez la **[FAQ complète](FAQ.md)**
+
+Cette FAQ est régulièrement mise à jour avec les questions remontées par les utilisateurs.
+
 ---
 
 ## 🛠️ Support & Questions
