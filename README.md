@@ -25,6 +25,7 @@
 ✅ **Chargement automatique** - Scroll infini géré + mode ULTRA anti-crash écran blanc pour gros comptes 2000+  
 ✅ **100% Console OU Extension** - Au choix  
 ✅ **Multi-langues** - Fonctionne sur tous les domaines Vinted (FR, DE, ES, etc.)
+
 ✅ **v1.5 - AutoFavs** - Possibilité comme sur clemz de mettre des favoris en automatique. 
 
 ---
