@@ -73,7 +73,7 @@
 
 Une fois activée, tu as ce petit encadré en bas à droite sur Vinted :
 
-![Encadré extension après activation](docs/screenshot-launcher.png)
+![Encadré extension après activation](<img width="495" height="153" alt="image" src="https://github.com/user-attachments/assets/87b46a03-169c-48d1-acaa-8af279ad089d" />)
 > 📸 **Espace pour ton image :** fais un screenshot de l'encadré noir avec les 2 boutons `🔴 Vendus 2420` et `💙 Dressing`
 
 ---
