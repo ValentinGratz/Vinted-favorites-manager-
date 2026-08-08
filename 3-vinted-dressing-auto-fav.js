@@ -3,7 +3,8 @@
 // Il va auto-fav N articles de ce dressing
 
 (async () => {
-  const N = parseInt(prompt('Combien de favs veux-tu mettre sur ce dressing ? (ex: 30)', '30')) || '30');
+  const input = prompt('Combien de favs veux-tu mettre sur ce dressing ? (ex: 30)', '30');
+  const N = parseInt(input) || 30;
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   if (!location.href.includes('/member/') && !location.href.includes('/membre/')) {
