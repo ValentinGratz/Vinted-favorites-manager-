@@ -69,6 +69,10 @@
 🎥 Démo :
 [![Démo](https://img.youtube.com/vi/rOKLo2hO7Wo/maxresdefault.jpg)](https://youtu.be/rOKLo2hO7Wo)
 
+🎥 **Démo de Clean Vinted l'extension chrome :**
+
+[![Démo de Clean Vinted](https://img.youtube.com/vi/ZaphzHGHKEM/maxresdefault.jpg)](https://www.youtube.com/watch?v=ZaphzHGHKEM)
+
 ---
 
 ## 🖼️ Extension Chrome - Aperçu
