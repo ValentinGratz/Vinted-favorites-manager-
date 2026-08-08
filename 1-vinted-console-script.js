@@ -1,6 +1,6 @@
 /**
  * ============================================
- * VINTED FAVORIS MANAGER - VERSION CONSOLE (Améliorée v2)
+ * VINTED FAVORIS MANAGER - VERSION CONSOLE (Améliorée v2.1)
  * ============================================
  * 
  * 📌 DESCRIPTION:
@@ -8,7 +8,7 @@
  * facilement les articles marqués "Vendu" de ta liste de favoris Vinted.
  * 
  * 🚀 MODE D'EMPLOI:
- * 1. Va sur: https://www.vinted.fr/member/items/favourite_list
+ * 1. Va sur: https://www.vinted.fr/member/items/favourite_list ou ta page favoris 
  * 2. Ouvre la console: Ctrl+Shift+J (Windows/Linux) ou Cmd+Option+J (Mac)
  * 3. Copie tout ce code et colle-le dans la console
  * 4. Appuie sur Entrée
@@ -17,7 +17,7 @@
  * 
  * ✨ FONCTIONNALITÉS:
  * ✅ Charge TOUS les favoris automatiquement (vraiment jusqu'au bout!)
- * ✅ Détecte tous les articles "Vendu"
+ * ✅ Détecte tous les articles "Vendu" (FR/ES/IT/DE/EN)
  * ✅ Les met en évidence visuellement en rouge
  * ✅ Interface de sélection avec checkboxes
  * ✅ Suppression en masse des articles
@@ -25,10 +25,11 @@
  * ✅ Rafraîchissement automatique après suppression
  * ✅ Modales custom (pas d'alert/confirm bloqués)
  * 
- * ⚠️ IMPORTANT:
+ * ⚠ IMPORTANT:
  * - La page se recharge automatiquement après suppression
  * - Supprimer des articles est IRRÉVERSIBLE
  * - Tu peux les re-favoriser à tout moment
+ * - Compatible vinted.fr / .es / .it / .de / .com
  */
 
 (async function() {
@@ -164,14 +165,11 @@
   let lastHeight = document.body.scrollHeight;
   let attempts = 0;
   const maxAttempts = 100;
-  let noChangeCount = 0; // Compte les fois sans changement
+  let noChangeCount = 0;
   
   while (attempts < maxAttempts && noChangeCount < 5) {
     window.scrollTo(0, document.body.scrollHeight);
-    
-    // Attendre que Vinted charge les articles (1.2 secondes au lieu de 0.8)
     await new Promise(resolve => setTimeout(resolve, 1200));
-    
     const newHeight = document.body.scrollHeight;
     const currentCount = document.querySelectorAll('[data-testid="grid-item"]').length;
     
@@ -179,7 +177,7 @@
       noChangeCount++;
       console.log(`⏳ Pas de nouveau contenu (${noChangeCount}/5) - Articles actuels: ${currentCount}`);
     } else {
-      noChangeCount = 0; // Réinitialiser le compteur
+      noChangeCount = 0;
       console.log(`📦 Articles chargés: ${currentCount}`);
     }
     
@@ -196,7 +194,8 @@
   const soldItems = [];
   allItems.forEach(gridItem => {
     const statusText = gridItem.querySelector('[data-testid*="status-text"]');
-    if (statusText && statusText.textContent.trim() === 'Vendu') {
+    // FIX UNIVERSAL: vinted.fr/.es/.it/.de/.com
+    if (statusText && ['vendu','vendido','sold','venduto','verkauft','verkocht','sprzedane'].includes(statusText.textContent.trim().toLowerCase())) {
       soldItems.push(gridItem);
     }
   });
@@ -264,7 +263,6 @@
   countText.style.cssText = 'margin: 0 0 15px 0; font-size: 13px; color: #aaa;';
   controlPanel.appendChild(countText);
 
-  // ========== ÉTAPE 5 : AJOUTER LES CHECKBOXES ==========
   const checkboxContainer = document.createElement('div');
   checkboxContainer.style.cssText = 'max-height: 350px; overflow-y: auto; margin-bottom: 15px; padding-right: 8px;';
 
@@ -297,7 +295,6 @@
 
   controlPanel.appendChild(checkboxContainer);
 
-  // ========== ÉTAPE 6 : BOUTONS D'ACTION ==========
   const buttonContainer = document.createElement('div');
   buttonContainer.style.cssText = 'display: flex; gap: 8px; margin-bottom: 12px;';
 
@@ -341,9 +338,8 @@
 
   controlPanel.appendChild(buttonContainer);
 
-  // ========== ÉTAPE 7 : BOUTON SUPPRIMER ==========
   const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = '🗑️ Supprimer la sélection';
+  deleteBtn.textContent = '🗑 Supprimer la sélection';
   deleteBtn.style.cssText = `
     width: 100%;
     padding: 14px;
@@ -373,12 +369,12 @@
       .map(({ item }) => item);
 
     if (selectedItems.length === 0) {
-      await showModal('⚠️ Aucun article sélectionné', 'info');
+      await showModal('⚠ Aucun article sélectionné', 'info');
       return;
     }
 
     const confirmed = await showConfirm(
-      `⚠️ Vous allez supprimer ${selectedItems.length} article(s) des favoris.\n\nÊtes-vous sûr ?`
+      `⚠ Vous allez supprimer ${selectedItems.length} article(s) des favoris.\n\nÊtes-vous sûr ?`
     );
     if (!confirmed) return;
 
@@ -386,7 +382,7 @@
     deleteBtn.textContent = '⏳ Suppression en cours...';
     deleteBtn.style.opacity = '0.6';
 
-    console.log(`🗑️ Suppression de ${selectedItems.length} article(s)...`);
+    console.log(`🗑 Suppression de ${selectedItems.length} article(s)...`);
     
     let successCount = 0;
     for (const item of selectedItems) {
@@ -418,13 +414,11 @@
 
   controlPanel.appendChild(deleteBtn);
 
-  // ========== ÉTAPE 8 : NOTES ==========
   const note = document.createElement('p');
   note.innerHTML = '💡 Les articles rouges = VENDUS<br>🔄 Rafraîchis après suppression';
   note.style.cssText = 'margin: 0; font-size: 12px; color: #999; border-top: 1px solid #555; padding-top: 12px; line-height: 1.5;';
   controlPanel.appendChild(note);
 
-  // ========== ÉTAPE 9 : BOUTON FERMER ==========
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✕';
   closeBtn.style.cssText = `
@@ -447,7 +441,6 @@
   closeBtn.onclick = () => controlPanel.remove();
   controlPanel.appendChild(closeBtn);
 
-  // ========== ÉTAPE 10 : AJOUTER LE PANNEAU ==========
   document.body.appendChild(controlPanel);
 
   console.log('✅ Panneau créé !');
