@@ -73,6 +73,9 @@
 
 [![Démo de Clean Vinted](https://img.youtube.com/vi/ZaphzHGHKEM/maxresdefault.jpg)](https://www.youtube.com/watch?v=ZaphzHGHKEM)
 
+<img width="1120" height="2240" alt="image" src="https://github.com/user-attachments/assets/46972626-aaa6-4537-b022-bc89bb3899d9" />
+
+
 ---
 
 ## 🖼️ Extension Chrome - Aperçu
