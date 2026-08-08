@@ -28,7 +28,7 @@ L'outil ne cherche pas à remplacer d'autres solutions existantes, mais à propo
 
 ---
 
-## ⚙️ Utilisation
+## ⚙ Utilisation
 
 ### Est-ce compliqué à utiliser ?
 Non.
