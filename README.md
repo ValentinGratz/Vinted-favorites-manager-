@@ -5,6 +5,8 @@
 
 2 outils simples + 1 extension Chrome pour nettoyer vos favoris : supprimez les articles vendus et faites des sessions de retrait par dressing. Même avec 2400+ favoris.
 
+> ⚠️ **Tu utilises CCleaner / BleachBit ?** Lis [ATTENTION_CCLEANER_BLEACHBIT.md](https://github.com/ValentinGratz/Vinted-favorites-manager-/blob/main/ATTENTION-CCLEANER-BLEACHBIT.md) sinon tu vas perdre tes données.
+
 ---
 
 ## 📋 Table des matières
