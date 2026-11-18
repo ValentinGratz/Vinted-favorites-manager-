@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Vinted → Vitesell
+// @name         Vinted → Vitesell (V1.0.10 - Copie Propre & Sans Popup)
 // @namespace    https://github.com/ValentinGratz/vinted2vitesell
-// @version      1.0.9
-// @description  Télécharge les photos et prépare les textes pour un copier-coller propre sur Vitesell.
+// @version      1.0.10
+// @description  Télécharge les photos et copie les textes en un clic sans pop-up agaçant ni "... plus".
 // @author       ValentinGratz
 // @match        https://www.vinted.fr/*
 // @match        https://*.vinted.fr/*
@@ -27,7 +27,7 @@
   const EXPORT_KEY = 'lastVitesellExport';
   const MAX_PHOTOS = 10;
   const VITESELL_URL = 'https://vitesell.com/publier';
-  const STYLE_ID = 'v2vs-v109-style';
+  const STYLE_ID = 'v2vs-v1010-style';
 
   if (!IS_VINTED && !IS_VITESELL) return;
 
@@ -40,7 +40,8 @@
       #v2vs-panel,#v2vs-vitesell-panel{box-sizing:border-box;color:#171717;font:13px/1.4 Arial,sans-serif}
       #v2vs-panel button,#v2vs-vitesell-panel button{display:block;box-sizing:border-box;width:100%;min-height:38px;font:700 13px Arial,sans-serif;border:0;border-radius:8px;padding:9px 11px;cursor:pointer;margin-top:6px}
       #v2vs-panel #v2vs-preview{display:block;max-height:120px;overflow:auto;white-space:pre-wrap}
-      .v2vs-copy-btn{background:#f3e8ff;border:1px solid #7c3aed;color:#7c3aed;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:bold;margin-top:4px;}
+      .v2vs-copy-btn{background:#f3e8ff;border:1px solid #7c3aed;color:#7c3aed;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:bold;margin-top:6px;width:100%;text-align:center;transition:all 0.2s;}
+      .v2vs-copy-btn.copied{background:#16a34a !important;border-color:#16a34a !important;color:#fff !important;}
     `;
     document.head.appendChild(style);
   }
@@ -90,10 +91,14 @@
   }
 
   async function getDescription(item) {
-    const fromApi = String(item?.description || '').trim();
-    if (fromApi) return fromApi;
-    const block = document.querySelector('[itemprop="description"],[data-testid="item-description"]');
-    return String(block?.innerText || '').trim();
+    let desc = String(item?.description || '').trim();
+    if (!desc) {
+      const block = document.querySelector('[itemprop="description"],[data-testid="item-description"]');
+      desc = String(block?.innerText || '').trim();
+    }
+    // Nettoyage automatique du fameux "... plus" ou des résidus de fin de bloc
+    desc = desc.replace(/\.\.\.\s*plus/gi, '').trim();
+    return desc;
   }
 
   function getPriceRaw(item) {
@@ -242,7 +247,7 @@
     const state = getExportedState(itemId) || { date: new Date().toISOString() };
     host.innerHTML = `
       <div style="font-weight:700">🚀 Vinted → Vitesell</div>
-      <div style="background:#ede9fe;color:#5b21b6;padding:8px;border-radius:8px;font-weight:700;text-align:center">✓ Annonces & Photos prêtes</div>
+      <div style="background:#ede9fe;color:#5b21b6;padding:8px;border-radius:8px;font-weight:700;text-align:center">✓ Photos & Textes prêts</div>
       <div class="v2vs-muted">Export : ${escapeHtml(formatDate(state.date))}</div>
       <button type="button" id="v2vs-reexport" style="background:#7c3aed;color:#fff">↻ Re-télécharger les photos</button>
       <button type="button" id="v2vs-reset" style="background:#eee;color:#333">Réinitialiser</button>
@@ -273,7 +278,6 @@
     })();
   }
 
-  // Déclenche le téléchargement automatique des photos sur le PC
   function downloadPhotosToPC(photosData) {
     photosData.forEach((dataUrl, index) => {
       const a = document.createElement('a');
@@ -295,7 +299,6 @@
       if (!payload.price) throw new Error('Prix introuvable.');
       if (!payload.photosData.length) throw new Error('Aucune photo récupérée.');
 
-      // Téléchargement direct des photos sur le PC
       downloadPhotosToPC(payload.photosData);
 
       GM_setValue(EXPORT_KEY, payload);
@@ -339,7 +342,7 @@
     }
   }
 
-  // --- PANNEAU VITESELL : BOUTONS COPIER-COLLER PROPRES ---
+  // --- PANNEAU VITESELL AVEC BOUTONS SANS POPUP ---
   function initVitesell() {
     if (!location.pathname.includes('/publier')) return;
     const payload = GM_getValue(EXPORT_KEY, null);
@@ -369,18 +372,20 @@
       </div>`;
     document.body.appendChild(panel);
 
-    panel.querySelector('#copy-title').onclick = () => {
-      navigator.clipboard.writeText(payload.fullTitle);
-      alert('Titre copié !');
+    const handleCopy = (text, btnElement, defaultText) => {
+      navigator.clipboard.writeText(text);
+      btnElement.textContent = '✓ Copié !';
+      btnElement.classList.add('copied');
+      setTimeout(() => {
+        btnElement.textContent = defaultText;
+        btnElement.classList.remove('copied');
+      }, 2000);
     };
-    panel.querySelector('#copy-desc').onclick = () => {
-      navigator.clipboard.writeText(payload.description || '');
-      alert('Description copiée !');
-    };
-    panel.querySelector('#copy-price').onclick = () => {
-      navigator.clipboard.writeText(payload.numericPrice || '');
-      alert('Prix copié !');
-    };
+
+    panel.querySelector('#copy-title').onclick = (e) => handleCopy(payload.fullTitle, e.target, '📋 Copier le Titre');
+    panel.querySelector('#copy-desc').onclick = (e) => handleCopy(payload.description || '', e.target, '📋 Copier la Description');
+    panel.querySelector('#copy-price').onclick = (e) => handleCopy(payload.numericPrice || '', e.target, `📋 Copier le Prix (${payload.numericPrice || ''})`);
+    
     panel.querySelector('#v2vs-vitesell-close').onclick = () => {
       panel.remove();
       GM_deleteValue(EXPORT_KEY);
